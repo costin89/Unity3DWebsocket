@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>A-Frame Client</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ws = new WebSocket('ws://localhost:8080/');
+            const clientId = Math.random().toString(36).substring(2, 15); // Erzeugt eine zufällige Client-ID
+
+            ws.onopen = () => {
+                console.log('WebSocket Verbindung hergestellt.');
+            };
+
+            ws.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                updateOtherCubePosition(message.clientId, message.data);
+            };
+
+            function updateOtherCubePosition(clientId, newPosition) {
+                let cube = document.querySelector(`#cube-${clientId}`);
+                if (!cube) {
+                    cube = document.createElement('a-box');
+                    cube.setAttribute('id', `cube-${clientId}`);
+                    cube.setAttribute('color', getRandomColor());
+                    document.querySelector('a-scene').appendChild(cube);
+                }
+                cube.setAttribute('position', newPosition);
+            }
+
+            function getRandomColor() {
+                const letters = '0123456789ABCDEF';
+                let color = '#';
+                for (let i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
+
+            // Beispiel: Senden der eigenen Würfelposition (sollte durch tatsächliche Logik ersetzt werden)
+            setInterval(() => {
+                const position = { x: Math.random() * 5, y: Math.random() * 5, z: Math.random() * 5 };
+                ws.send(JSON.stringify({ clientId, action: "updatePosition", data: position }));
+            }, 2000); // Aktualisiert die Position alle 2 Sekunden
+        });
+    </script>
+</head>
+<body>
+    <a-scene>
+        <a-box id="cube-${clientId}" position="-1 0.5 -3" rotation="0 45 45" color="#4CC3D9"></a-box>
+        <a-sky color="#ECECEC"></a-sky>
+    </a-scene>
+</body>
+</html>
