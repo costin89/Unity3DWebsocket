@@ -5,7 +5,7 @@
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const ws = new WebSocket('ws://217.83.130.148:8080/');
+            const ws = new WebSocket('ws://localhost:8080/');
             const clientId = Math.random().toString(36).substring(2, 15); // Erzeugt eine zufällige Client-ID
 
             ws.onopen = () => {
